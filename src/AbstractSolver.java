@@ -3,7 +3,6 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public abstract class AbstractSolver {
-
     protected int sizeOfBoard;
 
     protected int[] rows;
@@ -12,12 +11,15 @@ public abstract class AbstractSolver {
 
     protected Random random;
 
-    public AbstractSolver(int sizeOfBoard) {
+    public AbstractSolver(int sizeOfBoard, boolean fillConflictBoard) {
         this.sizeOfBoard = sizeOfBoard;
         rows = new int[sizeOfBoard];
         conflictsBoard = new int[sizeOfBoard][sizeOfBoard];
         random = new Random();
         initializeBoard();
+        if (fillConflictBoard) {
+            fillConflictBoard();
+        }
     }
 
     protected abstract void solve();
@@ -64,6 +66,14 @@ public abstract class AbstractSolver {
                 stream.print(rows[c] == r ? "* " : "_ ");
             }
             stream.println();
+        }
+    }
+
+    protected void fillConflictBoard() {
+        for (int col = 0; col < rows.length; col++) {
+            for (int row = 0; row < rows.length; row++) {
+                conflictsBoard[row][col] = getConflictsFromRowCol(row, col, rows.length);
+            }
         }
     }
 }

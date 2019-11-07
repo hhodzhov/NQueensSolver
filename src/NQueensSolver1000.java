@@ -2,8 +2,8 @@ import java.util.ArrayList;
 
 public class NQueensSolver1000 extends AbstractSolver {
 
-    public NQueensSolver1000(int sizeOfBoard) {
-        super(sizeOfBoard);
+    public NQueensSolver1000(int sizeOfBoard, boolean fillConflictBoard) {
+        super(sizeOfBoard, fillConflictBoard);
     }
 
     @Override
