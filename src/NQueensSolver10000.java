@@ -21,8 +21,7 @@ public class NQueensSolver10000 extends AbstractSolver {
 
             int columnWithMaxConflicts = candidates.get(random.nextInt(candidates.size()));
 
-            int minConflicts = sizeOfBoard;
-            findCandidatesWithMinConflicts(candidates, columnWithMaxConflicts, minConflicts);
+            findCandidatesWithMinConflicts(candidates, columnWithMaxConflicts);
 
             if (!candidates.isEmpty()) {
                 Integer bestQueenRow = candidates.get(random.nextInt(candidates.size()));
@@ -56,8 +55,9 @@ public class NQueensSolver10000 extends AbstractSolver {
         return maxConflicts;
     }
 
-    private void findCandidatesWithMinConflicts(ArrayList<Integer> candidates, int columnWithMaxConflicts, int minConflicts) {
+    private void findCandidatesWithMinConflicts(ArrayList<Integer> candidates, int columnWithMaxConflicts) {
         candidates.clear();
+        int minConflicts = sizeOfBoard;
         for (int row = 0; row < sizeOfBoard; row++) {
             int conflicts = conflictsBoard[row][columnWithMaxConflicts];
             if (conflicts == minConflicts) {
