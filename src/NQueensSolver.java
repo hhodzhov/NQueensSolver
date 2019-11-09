@@ -3,17 +3,17 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class NQueensSolver {
-    protected int sizeOfBoard;
+    private int sizeOfBoard;
 
-    protected int[] cols;
+    private int[] cols;
 
-    protected int[] rows;
+    private int[] rows;
 
-    protected int[] mainDiagonals;
+    private int[] mainDiagonals;
 
-    protected int[] secondaryDiagonals;
+    private int[] secondaryDiagonals;
 
-    protected Random random;
+    private Random random;
 
     public NQueensSolver(int sizeOfBoard) {
         this.sizeOfBoard = sizeOfBoard;
@@ -27,32 +27,25 @@ public class NQueensSolver {
 
     private void initializeBoard() {
         cols = new int[sizeOfBoard];
-        //place first queen
+        //place first queen in random row
         cols[0] = random.nextInt(sizeOfBoard);
-        //increment queen size in its row
+        //increment conflicts in its in queen's row
         rows[cols[0]]++;
-        //find this cell to which main diagonal belongs
+        //find the main diagonal of the cell
         int positionOfMainDiagonal = (0 - cols[0]) + sizeOfBoard - 1;
         mainDiagonals[positionOfMainDiagonal]++;
-        //find this cell to which secondary diagonal belongs
+        //find the secondary diagonal of the cell
         int positionOfSecondaryDiagonal = cols[0];
         secondaryDiagonals[positionOfSecondaryDiagonal]++;
 
         for (int j = 1; j < sizeOfBoard; j++) {
-            int minConflictsForCurrentColumn = getConflictsFromRowCol(0, j, false);
             ArrayList<Integer> cellsWithMinConflicts = new ArrayList<>();
+            int minConflictsForCurrentColumn = getConflictsFromRowCol(0, j, false);
+            cellsWithMinConflicts.add(0);
             for (int i = 1; i < sizeOfBoard; i++) {
-                cols[j] = i;
                 int conflicts = getConflictsFromRowCol(i, j, false);
-                if (conflicts == minConflictsForCurrentColumn) {
-                    cellsWithMinConflicts.add(i);
-                } else if (conflicts < minConflictsForCurrentColumn) {
-                    minConflictsForCurrentColumn = conflicts;
-                    cellsWithMinConflicts.clear();
-                    cellsWithMinConflicts.add(i);
-                } else if (cellsWithMinConflicts.isEmpty()) {
-                    cellsWithMinConflicts.add(i);
-                }
+                minConflictsForCurrentColumn = getMinConflicts(cellsWithMinConflicts,
+                        minConflictsForCurrentColumn, i, conflicts);
             }
 
             int minConflictRow = cellsWithMinConflicts.get(random.nextInt(cellsWithMinConflicts.size()));
@@ -88,13 +81,18 @@ public class NQueensSolver {
                 int previousRowIndex = cols[columnWithMaxConflicts];
                 cols[columnWithMaxConflicts] = bestQueenRow;
 
-                decrementConflictsFromPreviousPosition(previousRowIndex, columnWithMaxConflicts);
+                updateConflictsFromRowCol(previousRowIndex, columnWithMaxConflicts, Action.DECREMENT_BY_ONE);
 
-                incrementConflictsFromCurrentPosition(bestQueenRow, columnWithMaxConflicts);
+                updateConflictsFromRowCol(bestQueenRow, columnWithMaxConflicts, Action.INCREMENT_BY_ONE);
 //                System.out.println("Current board");
 //                printBoard(System.out);
             }
 
+            if (steps == sizeOfBoard * sizeOfBoard) {
+                System.out.println("Restarted");
+                initializeBoard();
+                steps = 0;
+            }
         }
     }
 
@@ -107,47 +105,57 @@ public class NQueensSolver {
         }
     }
 
+    private int getMinConflicts(ArrayList<Integer> cellsWithMinConflicts, int minConflicts, int row,
+                                int conflicts) {
+        if (conflicts == minConflicts) {
+            cellsWithMinConflicts.add(row);
+        } else if (conflicts < minConflicts) {
+            minConflicts = conflicts;
+            cellsWithMinConflicts.clear();
+            cellsWithMinConflicts.add(row);
+        }
+        return minConflicts;
+    }
+
     private int getConflictsFromRowCol(int row, int col, boolean fromQueenPosition) {
         int conflicts = 0;
         conflicts += rows[row];
         conflicts += mainDiagonals[(col - row) + sizeOfBoard - 1];
         conflicts += secondaryDiagonals[row + col];
 
+        //when we want to calculate the conflicts of a queen then we shouldn't count it's own conflict from it's position
         if (fromQueenPosition) {
+            //decrement with 3 because of the 3 increments above
             conflicts -= 3;
         }
-
         return conflicts;
     }
 
-    private void incrementConflictsFromCurrentPosition(int row, int col) {
-        rows[row]++;
-        mainDiagonals[(col - row) + sizeOfBoard - 1]++;
-        secondaryDiagonals[row + col]++;
-    }
-
-    private void decrementConflictsFromPreviousPosition(int row, int col) {
-        rows[row]--;
-        mainDiagonals[(col - row) + sizeOfBoard - 1]--;
-        secondaryDiagonals[row + col]--;
+    private void updateConflictsFromRowCol(int row, int col, Action action) {
+        switch (action) {
+            case INCREMENT_BY_ONE:
+                rows[row]++;
+                mainDiagonals[(col - row) + sizeOfBoard - 1]++;
+                secondaryDiagonals[row + col]++;
+                break;
+            case DECREMENT_BY_ONE:
+                rows[row]--;
+                mainDiagonals[(col - row) + sizeOfBoard - 1]--;
+                secondaryDiagonals[row + col]--;
+                break;
+        }
     }
 
     private void findQueensWithMinConflicts(ArrayList<Integer> conflictCandidates, int columnWithMaxConflicts) {
         conflictCandidates.clear();
         int minConflicts = sizeOfBoard;
         for (int row = 0; row < sizeOfBoard; row++) {
-            //don't check the current position of the queen
+            //don't check the current position of the queen, so continue with next iteration
             if (row == cols[columnWithMaxConflicts]) {
                 continue;
             }
             int conflicts = getConflictsFromRowCol(row, columnWithMaxConflicts, false);
-            if (conflicts == minConflicts) {
-                conflictCandidates.add(row);
-            } else if (conflicts < minConflicts) {
-                minConflicts = conflicts;
-                conflictCandidates.clear();
-                conflictCandidates.add(row);
-            }
+            minConflicts = getMinConflicts(conflictCandidates, minConflicts, row, conflicts);
         }
     }
 
