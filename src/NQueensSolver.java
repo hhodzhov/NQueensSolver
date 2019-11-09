@@ -95,12 +95,6 @@ public class NQueensSolver {
 //                printBoard(System.out);
             }
 
-//            steps++;
-//            if (steps == sizeOfBoard * 2) {
-//                System.out.println("Restarting...");
-//                steps = 0;
-//                initializeBoard();
-//            }
         }
     }
 
