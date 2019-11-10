@@ -38,22 +38,25 @@ public class NQueensSolver {
         int positionOfSecondaryDiagonal = cols[0];
         secondaryDiagonals[positionOfSecondaryDiagonal]++;
 
-        for (int j = 1; j < sizeOfBoard; j++) {
+        for (int column = 1; column < sizeOfBoard; column++) {
             ArrayList<Integer> cellsWithMinConflicts = new ArrayList<>();
-            int minConflictsForCurrentColumn = getConflictsFromRowCol(0, j, false);
+            int minConflictsForCurrentColumn = getConflictsFromRowCol(0, column, false);
             cellsWithMinConflicts.add(0);
-            for (int i = 1; i < sizeOfBoard; i++) {
-                int conflicts = getConflictsFromRowCol(i, j, false);
+            for (int row = 1; row < sizeOfBoard; row++) {
+                int conflicts = getConflictsFromRowCol(row, column, false);
                 minConflictsForCurrentColumn = getMinConflicts(cellsWithMinConflicts,
-                        minConflictsForCurrentColumn, i, conflicts);
+                        minConflictsForCurrentColumn, row, conflicts);
             }
 
             int minConflictRow = cellsWithMinConflicts.get(random.nextInt(cellsWithMinConflicts.size()));
-            cols[j] = minConflictRow;
+            cols[column] = minConflictRow;
 
+            //increase conflicts in queen's row
             rows[minConflictRow]++;
-            mainDiagonals[(j - minConflictRow) + sizeOfBoard - 1]++;
-            secondaryDiagonals[j + minConflictRow]++;
+            //increase conflicts in queen's main diagonal
+            mainDiagonals[(column - minConflictRow) + sizeOfBoard - 1]++;
+            //increase conflicts in queen's secondary diagonal
+            secondaryDiagonals[column + minConflictRow]++;
         }
 //        System.out.println("Initial board");
 //        printBoard(System.out);
@@ -97,9 +100,9 @@ public class NQueensSolver {
     }
 
     public void printBoard(PrintStream stream) {
-        for (int r = 0; r < sizeOfBoard; r++) {
-            for (int c = 0; c < sizeOfBoard; c++) {
-                stream.print(cols[c] == r ? "* " : "_ ");
+        for (int row = 0; row < sizeOfBoard; row++) {
+            for (int column = 0; column < sizeOfBoard; column++) {
+                stream.print(cols[column] == row ? "* " : "_ ");
             }
             stream.println();
         }
