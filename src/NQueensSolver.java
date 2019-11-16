@@ -27,7 +27,7 @@ public class NQueensSolver {
 
     private void initializeBoard() {
         cols = new int[sizeOfBoard];
-        //place first queen in random row
+        //place first queen in random row of first col
         cols[0] = random.nextInt(sizeOfBoard);
         //increment conflicts in its in queen's row
         rows[cols[0]]++;
@@ -49,6 +49,8 @@ public class NQueensSolver {
             }
 
             int minConflictRow = cellsWithMinConflicts.get(random.nextInt(cellsWithMinConflicts.size()));
+
+            //in current column and in the minConfictRow
             cols[column] = minConflictRow;
 
             //increase conflicts in queen's row
@@ -76,7 +78,7 @@ public class NQueensSolver {
 
             int columnWithMaxConflicts = conflictCandidates.get(random.nextInt(conflictCandidates.size()));
 
-            findQueensWithMinConflicts(conflictCandidates, columnWithMaxConflicts);
+            findQueenRowWithMinConflicts(conflictCandidates, columnWithMaxConflicts);
 
             if (!conflictCandidates.isEmpty()) {
                 Integer bestQueenRow = conflictCandidates.get(random.nextInt(conflictCandidates.size()));
@@ -149,7 +151,7 @@ public class NQueensSolver {
         }
     }
 
-    private void findQueensWithMinConflicts(ArrayList<Integer> conflictCandidates, int columnWithMaxConflicts) {
+    private void findQueenRowWithMinConflicts(ArrayList<Integer> conflictCandidates, int columnWithMaxConflicts) {
         conflictCandidates.clear();
         int minConflicts = sizeOfBoard;
         for (int row = 0; row < sizeOfBoard; row++) {
@@ -162,6 +164,7 @@ public class NQueensSolver {
         }
     }
 
+    //get the columns with max conflicts
     private int findQueensWithMaxConflicts(ArrayList<Integer> conflictCandidates) {
         int maxConflicts = 0;
         conflictCandidates.clear();
